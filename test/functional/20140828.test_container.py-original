@@ -190,7 +190,6 @@ class TestContainer(unittest.TestCase):
                          {'X-Auth-Token': token})
             return check_response(conn)
 
-        a = '''
         name = uuid4().hex
         resp = retry(put, name, 'Value')
         resp.read()
@@ -222,7 +221,6 @@ class TestContainer(unittest.TestCase):
         resp = retry(delete, name)
         resp.read()
         self.assertEqual(resp.status, 204)
-        '''
 
     def test_POST_metadata(self):
         if tf.skip:
@@ -437,7 +435,6 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEqual(resp.status, 400)
 
-    a = '''
     def test_public_container(self):
         if tf.skip:
             raise SkipTest
@@ -478,9 +475,7 @@ class TestContainer(unittest.TestCase):
             raise Exception('Should not have been able to GET')
         except Exception as err:
             self.assert_(str(err).startswith('No result after '), err)
-    '''
 
-    a = '''
     def test_cross_account_container(self):
         if tf.skip or tf.skip2:
             raise SkipTest
@@ -536,9 +531,7 @@ class TestContainer(unittest.TestCase):
         resp = retry(get2, use_account=2)
         resp.read()
         self.assertEqual(resp.status, 403)
-    '''
 
-    a = '''
     def test_cross_account_public_container(self):
         if tf.skip or tf.skip2:
             raise SkipTest
@@ -607,7 +600,6 @@ class TestContainer(unittest.TestCase):
         resp = retry(put2, use_account=2)
         resp.read()
         self.assertEqual(resp.status, 201)
-    '''
 
     def test_nonadmin_user(self):
         if tf.skip or tf.skip3:
@@ -621,7 +613,6 @@ class TestContainer(unittest.TestCase):
                          {'X-Auth-Token': token})
             return check_response(conn)
 
-        a = '''
         resp = retry(get1)
         resp.read()
 
@@ -678,7 +669,6 @@ class TestContainer(unittest.TestCase):
         resp = retry(put3, use_account=3)
         resp.read()
         self.assertEqual(resp.status, 201)
-        '''
 
     @requires_acls
     def test_read_only_acl_listings(self):
@@ -699,7 +689,6 @@ class TestContainer(unittest.TestCase):
                          {'X-Auth-Token': token})
             return check_response(conn)
 
-        a = '''
         # cannot list containers
         resp = retry(get, use_account=3)
         resp.read()
@@ -733,7 +722,6 @@ class TestContainer(unittest.TestCase):
         listing = resp.read()
         self.assertEquals(resp.status, 200)
         self.assert_(new_container_name in listing)
-        '''
 
     @requires_acls
     def test_read_only_acl_metadata(self):
@@ -755,7 +743,6 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/%s' % name, '', new_headers)
             return check_response(conn)
 
-        a = '''
         # add some metadata
         value = str(uuid4())
         headers = {'x-container-meta-test': value}
@@ -792,9 +779,7 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 204)
         self.assertEqual(resp.getheader('X-Container-Meta-Test'), value)
-        '''
 
-    a = '''
     @requires_acls
     def test_read_write_acl_listings(self):
         if tf.skip3:
@@ -865,9 +850,7 @@ class TestContainer(unittest.TestCase):
         resp = retry(delete, empty_container_name, use_account=3)
         resp.read()
         self.assertEquals(resp.status, 204)
-    '''
 
-    a = '''
     @requires_acls
     def test_read_write_acl_metadata(self):
         if tf.skip3:
@@ -938,7 +921,6 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 204)
         self.assertEqual(resp.getheader('X-Container-Meta-Test'), None)
-    '''
 
     a = '''
     @requires_acls
@@ -1033,7 +1015,6 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/%s' % name, '', new_headers)
             return check_response(conn)
 
-        a = '''
         # add some metadata
         value = str(uuid4())
         headers = {'x-container-meta-test': value}
@@ -1084,7 +1065,6 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 204)
         self.assertEqual(resp.getheader('X-Container-Meta-Test'), None)
-        '''
 
     @requires_acls
     def test_protected_container_sync(self):
@@ -1106,7 +1086,6 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/%s' % name, '', new_headers)
             return check_response(conn)
 
-        a = '''
         # add some metadata
         value = str(uuid4())
         headers = {
@@ -1208,7 +1187,6 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 204)
         self.assertEqual(resp.getheader('X-Container-Sync-Key'), new_secret)
-        '''
 
     @requires_acls
     def test_protected_container_acl(self):
@@ -1230,7 +1208,6 @@ class TestContainer(unittest.TestCase):
             conn.request('POST', parsed.path + '/%s' % name, '', new_headers)
             return check_response(conn)
 
-        a = '''
         # add some container acls
         value = str(uuid4())
         headers = {
@@ -1345,7 +1322,6 @@ class TestContainer(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 204)
         self.assertEqual(resp.getheader('X-Container-Read'), '.r:*')
-        '''
 
     def test_long_name_content_type(self):
         if tf.skip:
@@ -1363,7 +1339,6 @@ class TestContainer(unittest.TestCase):
         self.assertEqual(resp.getheader('Content-Type'),
                          'text/html; charset=UTF-8')
 
-    a = '''
     def test_null_name(self):
         if tf.skip:
             raise SkipTest
@@ -1379,7 +1354,6 @@ class TestContainer(unittest.TestCase):
         else:
             self.assertEqual(resp.read(), 'Invalid UTF8 or contains NULL')
             self.assertEqual(resp.status, 412)
-    '''
 
     def test_create_container_gets_default_policy_by_default(self):
         try:
@@ -1406,7 +1380,6 @@ class TestContainer(unittest.TestCase):
         self.assertEquals(headers.get('x-storage-policy'),
                           default_policy['name'])
 
-    a = '''
     def test_error_invalid_storage_policy_name(self):
         def put(url, token, parsed, conn, headers):
             new_headers = dict({'X-Auth-Token': token}, **headers)
@@ -1418,7 +1391,6 @@ class TestContainer(unittest.TestCase):
         resp = retry(put, {'X-Storage-Policy': uuid4().hex})
         resp.read()
         self.assertEqual(resp.status, 400)
-    '''
 
     @requires_policies
     def test_create_non_default_storage_policy_container(self):
