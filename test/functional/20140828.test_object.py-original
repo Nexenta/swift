@@ -133,7 +133,6 @@ class TestObject(unittest.TestCase):
         resp.read()
         self.assertEquals(resp.status, 400)
 
-    a = '''
     def test_copy_object(self):
         if tf.skip:
             raise SkipTest
@@ -207,7 +206,6 @@ class TestObject(unittest.TestCase):
         resp = retry(delete)
         resp.read()
         self.assertEqual(resp.status, 204)
-    '''
 
     def test_public_object(self):
         if tf.skip:
@@ -217,8 +215,6 @@ class TestObject(unittest.TestCase):
             conn.request('GET',
                          '%s/%s/%s' % (parsed.path, self.container, self.obj))
             return check_response(conn)
-
-        a = '''
         try:
             resp = retry(get)
             raise Exception('Should not have been able to GET')
@@ -249,7 +245,6 @@ class TestObject(unittest.TestCase):
             raise Exception('Should not have been able to GET')
         except Exception as err:
             self.assert_(str(err).startswith('No result after '))
-        '''
 
     def test_private_object(self):
         if tf.skip or tf.skip3:
@@ -261,8 +256,6 @@ class TestObject(unittest.TestCase):
                 parsed.path, self.container, self.obj), '',
                 {'X-Auth-Token': token})
             return check_response(conn)
-        
-        a = '''
         resp = retry(get, use_account=3)
         resp.read()
         self.assertEqual(resp.status, 403)
@@ -345,7 +338,6 @@ class TestObject(unittest.TestCase):
         resp = retry(delete)
         resp.read()
         self.assertEqual(resp.status, 204)
-        '''
 
     @requires_acls
     def test_read_only(self):
@@ -380,7 +372,6 @@ class TestObject(unittest.TestCase):
                 {'X-Auth-Token': token})
             return check_response(conn)
 
-        a = '''
         # cannot list objects
         resp = retry(get_listing, use_account=3)
         resp.read()
@@ -428,7 +419,6 @@ class TestObject(unittest.TestCase):
         self.assertEquals(resp.status, 200)
         self.assert_(obj_name not in listing)
         self.assert_(self.obj in listing)
-        '''
 
     @requires_acls
     def test_read_write(self):
@@ -463,7 +453,6 @@ class TestObject(unittest.TestCase):
                 {'X-Auth-Token': token})
             return check_response(conn)
 
-        a = '''
         # cannot list objects
         resp = retry(get_listing, use_account=3)
         resp.read()
@@ -511,9 +500,7 @@ class TestObject(unittest.TestCase):
         self.assertEquals(resp.status, 200)
         self.assert_(obj_name in listing)
         self.assert_(self.obj not in listing)
-        '''
 
-    a = '''
     @requires_acls
     def test_admin(self):
         if tf.skip3:
@@ -594,9 +581,7 @@ class TestObject(unittest.TestCase):
         self.assertEquals(resp.status, 200)
         self.assert_(obj_name in listing)
         self.assert_(self.obj not in listing)
-    '''
 
-    a = '''
     def test_manifest(self):
         if tf.skip:
             raise SkipTest
@@ -866,7 +851,6 @@ class TestObject(unittest.TestCase):
         resp = retry(delete)
         resp.read()
         self.assertEqual(resp.status, 204)
-    '''
 
     def test_delete_content_type(self):
         if tf.skip:
@@ -912,7 +896,6 @@ class TestObject(unittest.TestCase):
         resp.read()
         self.assertEqual(resp.status, 400)
 
-    a = '''
     def test_null_name(self):
         if tf.skip:
             raise SkipTest
@@ -928,9 +911,7 @@ class TestObject(unittest.TestCase):
         else:
             self.assertEqual(resp.read(), 'Invalid UTF8 or contains NULL')
             self.assertEqual(resp.status, 412)
-    '''
 
-    a = '''
     def test_cors(self):
         if tf.skip:
             raise SkipTest
@@ -1036,7 +1017,6 @@ class TestObject(unittest.TestCase):
             headers = dict((k.lower(), v) for k, v in resp.getheaders())
             self.assertEquals(headers.get('access-control-allow-origin'),
                               'http://m.com')
-    '''
 
     @requires_policies
     def test_cross_policy_copy(self):
