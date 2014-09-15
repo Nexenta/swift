@@ -1072,7 +1072,12 @@ class Controller(object):
             if self.have_quorum(statuses, len(start_nodes)):
                 break
         # give any pending requests *some* chance to finish
-        pile.waitall(self.app.post_quorum_timeout)
+        finished_quickly = pile.waitall(self.app.post_quorum_timeout)
+        for resp in finished_quickly:
+            if not resp:
+                continue
+            response.append(resp)
+            statuses.append(resp[0])
         while len(response) < len(start_nodes):
             response.append((HTTP_SERVICE_UNAVAILABLE, '', '', ''))
         statuses, reasons, resp_headers, bodies = zip(*response)
@@ -1152,7 +1157,7 @@ class Controller(object):
         """
         return self.GETorHEAD(req)
 
-    def autocreate_account(self, env, account):
+    def autocreate_account(self, req, account):
         """
         Autocreate an account
 
@@ -1164,12 +1169,17 @@ class Controller(object):
         headers = {'X-Timestamp': Timestamp(time.time()).internal,
                    'X-Trans-Id': self.trans_id,
                    'Connection': 'close'}
+        # transfer any x-account-sysmeta headers from original request
+        # to the autocreate PUT
+        headers.update((k, v)
+                       for k, v in req.headers.iteritems()
+                       if is_sys_meta('account', k))
         resp = self.make_requests(Request.blank('/v1' + path),
                                   self.app.account_ring, partition, 'PUT',
                                   path, [headers] * len(nodes))
         if is_success(resp.status_int):
             self.app.logger.info('autocreate account %r' % path)
-            clear_info_cache(self.app, env, account)
+            clear_info_cache(self.app, req.environ, account)
         else:
             self.app.logger.warning('Could not autocreate account %r' % path)
 
