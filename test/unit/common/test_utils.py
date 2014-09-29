@@ -1503,6 +1503,9 @@ class TestUtils(unittest.TestCase):
             utils.load_libc_function('printf')))
         self.assert_(callable(
             utils.load_libc_function('some_not_real_function')))
+        self.assertRaises(AttributeError,
+                          utils.load_libc_function, 'some_not_real_function',
+                          fail_if_missing=True)
 
     def test_readconf(self):
         conf = '''[section1]
@@ -3859,6 +3862,7 @@ class TestAuditLocationGenerator(unittest.TestCase):
             audit = lambda: list(utils.audit_location_generator(
                 tmpdir, "data", mount_check=False))
             self.assertRaises(OSError, audit)
+        rmtree(tmpdir)
 
         #Check Raise on Bad Suffix
         tmpdir = mkdtemp()
@@ -3877,6 +3881,7 @@ class TestAuditLocationGenerator(unittest.TestCase):
             audit = lambda: list(utils.audit_location_generator(
                 tmpdir, "data", mount_check=False))
             self.assertRaises(OSError, audit)
+        rmtree(tmpdir)
 
         #Check Raise on Bad Hash
         tmpdir = mkdtemp()
@@ -3895,6 +3900,7 @@ class TestAuditLocationGenerator(unittest.TestCase):
             audit = lambda: list(utils.audit_location_generator(
                 tmpdir, "data", mount_check=False))
             self.assertRaises(OSError, audit)
+        rmtree(tmpdir)
 
     def test_non_dir_drive(self):
         with temptree([]) as tmpdir:
