@@ -18,6 +18,11 @@ curl 10.3.30.230:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_287e400
 
 ## For cyberduck
 curl 10.3.30.230:9981/v1/test/10.3.30.230 -X PUT -i
+curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd -X PUT -i
+curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd/a -X PUT -i
+curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd/aa -X PUT -i
+curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd/b -X PUT -i
+curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd/c -X PUT -i
 
 ##
 ## Execution
