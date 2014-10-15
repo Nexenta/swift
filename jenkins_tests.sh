@@ -22,6 +22,10 @@ curl 10.3.30.164:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_822f9e5
 curl 10.3.30.164:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_018dcd2252bd490d8b3d03143e1b2018 -i
 curl 10.3.30.164:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_287e400117b84e0fac1fbea4ea97c15b -i
 
+## For 10.3.30.182
+curl 10.3.30.182:8080/clusters/cltest/tenants -X POST -d tenantName=2bede54ab14e4d42a6db348c02bd3dd2 -i
+curl 10.3.30.182:8080/clusters/cltest/tenants -X POST -d tenantName=822f9e53e2be4e32b576941dac49566d -i
+
 ## For cyberduck
 curl 10.3.30.230:9981/v1/test/10.3.30.230 -X PUT -i
 curl 10.3.30.230:9981/v1/test/10.3.30.230/ddd -X PUT -i
