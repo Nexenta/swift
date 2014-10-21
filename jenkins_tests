@@ -1,0 +1,58 @@
+#!/usr/bin/ruby
+
+#
+# Author:    Victor Piousbox
+# Copyright: Nexenta Systems
+# Date:      20141025
+#
+# This file is the endpoint for swift python tests, as run from Jenkins.
+#
+
+if 1 != ARGV.length
+  puts "Usage: ./jenkins_tests x.x.x.x"
+  puts "where x.x.x.x is the IP of the machine under test"
+  exit
+end
+
+# client_ip = "10.3.30.164"
+client_ip = ARGV[0]
+client_addr = "#{client_ip}:9981"
+
+def puts! args, label=""
+  puts "+++ +++ #{label}"
+  puts args.inspect
+end
+
+ENV['OS_AUTH_URL'] = "http://127.0.0.1:35357/v2.0"
+ENV['OS_SERVICE_TOKEN'] = "nexenta"
+ENV['SERVICE_ENDPOINT'] = "http://127.0.0.1:35357/v2.0"
+
+# destroy the existing service
+existing_services = `keystone service-list | grep object-store | cut -d '|' -f2`.gsub("\n", "").split(" ")
+existing_services.each { |existing_service| `keystone service-delete #{existing_service}` }
+
+# create a new service
+`keystone service-create --name ccow --type object-store`
+new_service = `keystone service-list | grep object-store | cut -d '|' -f2`.gsub(" ", "").chomp
+`keystone endpoint-create --region RegionOne --service-id=#{new_service} \
+                          --publicurl="http://#{client_addr}/v1/AUTH_\\$(tenant_id)s" \
+                          --internalurl="http://#{client_addr}/v1/AUTH_\\$(tenant_id)s" \
+                          --adminurl="http://#{client_ip}:8080" &&
+ sleep 3`
+
+# verification:
+# puts! `keystone endpoint-list | grep #{new_service}`
+
+`service apache2 stop && sleep 4 && 
+ service apache2 start && sleep 4`
+
+# create tenants
+new_tenants = `keystone tenant-list | grep True | cut -d '|' -f2`.gsub("\n", "").split(" ")
+new_tenants.each do |tenant|
+  `curl http://#{client_ip}:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_#{tenant} -i`
+end
+
+`./.functests test_account.py && 
+ ./.functests test_container.py &&
+ ./.functests test_object.py &&
+ ./.functests tests.py`
