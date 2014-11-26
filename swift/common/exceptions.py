@@ -75,6 +75,10 @@ class DiskFileDeviceUnavailable(DiskFileError):
     pass
 
 
+class DiskFileXattrNotSupported(DiskFileError):
+    pass
+
+
 class DeviceUnavailable(SwiftException):
     pass
 
@@ -120,6 +124,18 @@ class EmptyRingError(RingBuilderError):
 
 
 class DuplicateDeviceError(RingBuilderError):
+    pass
+
+
+class UnPicklingError(SwiftException):
+    pass
+
+
+class FileNotFoundError(SwiftException):
+    pass
+
+
+class PermissionError(SwiftException):
     pass
 
 
