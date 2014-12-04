@@ -59,8 +59,6 @@ end
 # and this one is not running:
 # ./.functests tests.py
 
-exit_status = `echo $?`.strip.to_i
-
+exit_status =  $?.exitstatus
 puts! exit_status, "Exit status of Swift Python Tests"
-
 exit exit_status
