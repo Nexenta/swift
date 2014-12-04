@@ -18,6 +18,7 @@
 
 import cPickle as pickle
 import datetime
+import errno
 import operator
 import os
 import mock
@@ -551,9 +552,17 @@ class TestObjectController(unittest.TestCase):
             '/sda1/p/a/c/o', environ={'REQUEST_METHOD': 'PUT'},
             headers={'X-Timestamp': timestamp,
                      'Content-Length': '6',
-                     'Content-Type': 'application/octet-stream'})
+                     'Content-Type': 'application/octet-stream',
+                     'x-object-meta-test': 'one',
+                     'Custom-Header': '*',
+                     'X-Backend-Replication-Headers':
+                     'Content-Type Content-Length'})
         req.body = 'VERIFY'
-        resp = req.get_response(self.object_controller)
+        with mock.patch.object(self.object_controller, 'allowed_headers',
+                               ['Custom-Header']):
+            self.object_controller.allowed_headers = ['Custom-Header']
+            resp = req.get_response(self.object_controller)
+
         self.assertEquals(resp.status_int, 201)
         objfile = os.path.join(
             self.testdir, 'sda1',
@@ -567,7 +576,9 @@ class TestObjectController(unittest.TestCase):
                            'Content-Length': '6',
                            'ETag': '0b4c12d7e0a73840c1c4f148fda3b037',
                            'Content-Type': 'application/octet-stream',
-                           'name': '/a/c/o'})
+                           'name': '/a/c/o',
+                           'X-Object-Meta-Test': 'one',
+                           'Custom-Header': '*'})
 
     def test_PUT_overwrite(self):
         req = Request.blank(
@@ -715,6 +726,27 @@ class TestObjectController(unittest.TestCase):
                            'name': '/a/c/o',
                            'X-Object-Meta-1': 'One',
                            'X-Object-Meta-Two': 'Two'})
+
+    def test_PUT_user_metadata_no_xattr(self):
+        timestamp = normalize_timestamp(time())
+        req = Request.blank(
+            '/sda1/p/a/c/o', environ={'REQUEST_METHOD': 'PUT'},
+            headers={'X-Timestamp': timestamp,
+                     'Content-Type': 'text/plain',
+                     'ETag': 'b114ab7b90d9ccac4bd5d99cc7ebb568',
+                     'X-Object-Meta-1': 'One',
+                     'X-Object-Meta-Two': 'Two'})
+        req.body = 'VERIFY THREE'
+
+        def mock_get_and_setxattr(*args, **kargs):
+            error_num = errno.ENOTSUP if hasattr(errno, 'ENOTSUP') else \
+                errno.EOPNOTSUPP
+            raise IOError(error_num, 'Operation not supported')
+
+        with mock.patch('xattr.getxattr', mock_get_and_setxattr):
+            with mock.patch('xattr.setxattr', mock_get_and_setxattr):
+                resp = req.get_response(self.object_controller)
+                self.assertEquals(resp.status_int, 507)
 
     def test_PUT_client_timeout(self):
         class FakeTimeout(BaseException):
@@ -4414,7 +4446,7 @@ class TestZeroCopy(unittest.TestCase):
         self.wsgi_greenlet = spawn(
             wsgi.server, listener, self.object_controller, NullLogger())
 
-        self.http_conn = httplib.HTTPConnection('localhost', port)
+        self.http_conn = httplib.HTTPConnection('127.0.0.1', port)
         self.http_conn.connect()
 
     def tearDown(self):

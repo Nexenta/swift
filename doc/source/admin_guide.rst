@@ -145,9 +145,20 @@ then it is just best to replace the drive, format it, remount it, and let
 replication fill it up.
 
 If the drive can't be replaced immediately, then it is best to leave it
-unmounted, and remove the drive from the ring. This will allow all the
+unmounted, and set the device weight to 0. This will allow all the
 replicas that were on that drive to be replicated elsewhere until the drive
-is replaced.  Once the drive is replaced, it can be re-added to the ring.
+is replaced. Once the drive is replaced, the device weight can be increased
+again. Setting the device weight to 0 instead of removing the drive from the
+ring gives Swift the chance to replicate data from the failing disk too (in case
+it is still possible to read some of the data).
+
+Setting the device weight to 0 (or removing a failed drive from the ring) has
+another benefit: all partitions that were stored on the failed drive are
+distributed over the remaining disks in the cluster, and each disk only needs to
+store a few new partitions. This is much faster compared to replicating all
+partitions to a single, new disk. It decreases the time to recover from a
+degraded number of replicas significantly, and becomes more and more important
+with bigger disks.
 
 -----------------------
 Handling Server Failure
@@ -827,7 +838,7 @@ Metric Name                      Description
 `container-sync.deletes`         Count of container database rows sync'ed by
                                  deletion.
 `container-sync.deletes.timing`  Timing data for each container database row
-                                 sychronization via deletion.
+                                 synchronization via deletion.
 `container-sync.puts`            Count of container database rows sync'ed by PUTing.
 `container-sync.puts.timing`     Timing data for each container database row
                                  synchronization via PUTing.
@@ -1136,7 +1147,7 @@ Swift Orphans
 
 Swift Orphans are processes left over after a reload of a Swift server.
 
-For example, when upgrading a proxy server you would probaby finish
+For example, when upgrading a proxy server you would probably finish
 with a `swift-init proxy-server reload` or `/etc/init.d/swift-proxy
 reload`. This kills the parent proxy server process and leaves the
 child processes running to finish processing whatever requests they
@@ -1214,3 +1225,11 @@ following:
 
 See :ref:`custom-logger-hooks-label` for sample use cases.
 
+------------------------
+Securing OpenStack Swift
+------------------------
+
+Please refer to the security guides at:
+
+* http://docs.openstack.org/sec/
+* http://docs.openstack.org/security-guide/content/object-storage.html
