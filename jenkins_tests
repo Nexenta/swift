@@ -23,6 +23,8 @@ def puts! args, label=""
   puts args.inspect
 end
 
+puts! client_addr, "The gateway being tested is"
+
 ENV['OS_AUTH_URL'] = "http://127.0.0.1:35357/v2.0"
 ENV['OS_SERVICE_TOKEN'] = "nexenta"
 ENV['SERVICE_ENDPOINT'] = "http://127.0.0.1:35357/v2.0"
