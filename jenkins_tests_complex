@@ -51,14 +51,14 @@ new_service = `keystone service-list | grep object-store | cut -d '|' -f2`.gsub(
 # create tenants
 new_tenants = `keystone tenant-list | grep True | cut -d '|' -f2`.gsub("\n", "").split(" ")
 new_tenants.each do |tenant|
-  ` curl http://#{client_ip}:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_#{tenant} -s -H "Authorization: Basic YWRtaW46bmV4ZW50YQ==" `
+  `curl http://#{client_ip}:8080/clusters/cltest/tenants -X POST -d tenantName=AUTH_#{tenant} -s`
 end
 
-`./.functests test_account.py && 
- ./.functests test_container.py &&
- ./.functests test_object.py`
+#`./.functests test_account.py && 
+# ./.functests test_container.py &&
+# ./.functests test_object.py`
 
-# `./.functests tests.py`
+`./.functests tests.py`
 
 exit_status =  $?.exitstatus
 puts! exit_status, "Exit status of Swift Python Tests"
